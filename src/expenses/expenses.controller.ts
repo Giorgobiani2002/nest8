@@ -1,16 +1,24 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
 import { ExpensesService } from './expenses.service';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
+import { HasUserId } from './guards/hasUserId.guard';
+
 
 @Controller('expenses')
 export class ExpensesController {
   constructor(private readonly expensesService: ExpensesService) {}
 
   @Post()
-  create(@Body() createExpenseDto: CreateExpenseDto) {
-    return this.expensesService.create(createExpenseDto);
+  @UseGuards(HasUserId)
+  create(@Req() request, @Body() createExpenseDto: CreateExpenseDto) {
+    const userId = request.userId; 
+    if (!userId) {
+      throw new Error('User ID not found in request');
+    }
+    return this.expensesService.create(userId, createExpenseDto);
   }
+
 
   @Get()
   findAll() {

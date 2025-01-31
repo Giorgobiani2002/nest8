@@ -57,4 +57,10 @@ export class UsersService {
 
     return { message: 'deleted succesfuly' };
   }
+  async addPost(userId, postId) {
+    const updateUser = await this.usersModel.findByIdAndUpdate(userId, {
+      $push: { posts: postId },
+    });
+    return updateUser;
+  }
 }
